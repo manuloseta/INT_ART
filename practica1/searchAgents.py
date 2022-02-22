@@ -404,12 +404,13 @@ def cornersHeuristic(state, problem):
             j += 1
         return i
 
-    # ALMOST IT
+    # I FUCKIN DID IT BITCH
     position = (state[0], state[1])
     ncorners = [state[2], state[3], state[4], state[5]]
     corners_left = []
     distances = []
     total = 0
+    maxDist = manhattanDistance(corners[0], corners[3])
 
     for i in [0,1,2,3]:
         if(ncorners[i] == 0):
@@ -420,8 +421,19 @@ def cornersHeuristic(state, problem):
         for c in corners_left:
             distances.append(manhattanDistance(c, current))
         i = lowest(distances)
-        total += distances.pop(i)
+        seg = distances.pop(i)
         current = corners_left.pop(i)
+        
+        if len(corners_left) == 2 and manhattanDistance(corners_left[0], corners_left[1]) == maxDist:
+                aux = current
+                i = lowest(distances)
+                total += distances.pop(i)
+                distances.append(seg)
+                current = corners_left.pop(i)
+                corners_left.append(aux)
+        else:
+            total += seg
+        
         distances = []
 
 

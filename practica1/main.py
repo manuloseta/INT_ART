@@ -10,15 +10,15 @@ if __name__ == '__main__':
             j += 1
         return i
 
-    a = Node((1,1), None, None, None)
-    b = Node((1,2), a, 9, 9)
-    c = Node((1,3), b, 3, 78)
+    a = Node((1,1), None, None)
+    b = Node((1,2), a, 9)
+    c = Node((1,3), ['s','w','e'], 3)
     d = [1,1,1]
     e = [2,3,4,1,0,9,8,7]
     
     print(Node.getState(c))
-    print(Node.getParent(c))
-    print(Node.getOperator(c))
-    print(Node.getCost(c))
-    print(Node.calcCumulative(c))
+    # print(Node.getParent(c))
+    print(Node.getOperators(c))
+    # print(Node.getCost(c))
+    # print(Node.getCumulative(c))
     print(lowest(e))

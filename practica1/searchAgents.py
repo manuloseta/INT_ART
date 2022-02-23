@@ -272,8 +272,6 @@ class CornersProblem(search.SearchProblem):
 
     You must select a suitable state space and successor function
 
-    CHANGE STRUCTURE THAT GOES INTO THE CLOSED LIST. CHANGE STATE ITSELF
-
     """
 
     def __init__(self, startingGameState):
@@ -291,16 +289,18 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.costFn = lambda x: 1
+        self.costFn = lambda x: 1 # Same cost function as the position search problem
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
+        Our state space has 6 elements: the first two store pacman's location; the last 4
+        refer to each of the four corners (False if the corner is not visited, True otherwise)
         """
         "*** YOUR CODE HERE ***"
         x,y = self.startingPosition
-        start = (x, y, 0, 0, 0, 0)
+        start = (x, y, False, False, False, False)
         return start
 
     def isGoalState(self, state):
@@ -310,14 +310,14 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
 
         position = (state[0], state[1])
-        corners = [state[2], state[3], state[4], state[5]]
-        if position in self.corners:
+        state_corners = [state[2], state[3], state[4], state[5]]
+        
+        if position in self.corners: # We update the state of the corners before generating successors
             i = self.corners.index(position)
-            corners[i] = 1
+            state_corners[i] = True
 
-        if corners[0]*corners[1]*corners[2]*corners[3] != 0:
-            return True
-        return False
+        # Only returns True if all 4 corners are visited
+        return (state_corners[0] and state_corners[1] and state_corners[2] and state_corners[3]) 
 
     def getSuccessors(self, state):
         """
@@ -334,18 +334,11 @@ class CornersProblem(search.SearchProblem):
         position = (x,y)
         successors = []
         
-        if position in self.corners:
+        if position in self.corners: # We update the state of the corners before generating successors
             i = self.corners.index(position)
-            corners[i] = 1
+            corners[i] = True
 
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            # Add a successor state to the successor list if the action is legal
-            # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
-
             "*** YOUR CODE HERE ***"
 
             dx, dy = Actions.directionToVector(action)
@@ -354,7 +347,7 @@ class CornersProblem(search.SearchProblem):
             if not hitsWall:
                 nextState = (nextx, nexty, corners[0], corners[1], corners[2], corners[3])
                 cost = self.costFn(nextState)
-                successors.append( ( nextState, action, cost) )
+                successors.append( (nextState, action, cost) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -390,13 +383,12 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    def euclideanDistance(xy1, xy2):
-        return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
     def manhattanDistance(xy1, xy2):
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
     def lowest(list):
+        """Given a list (of numbers in this case), returns the index of the lowest element in it"""
         i,j,k = 0,1,len(list)
         while(j < k):
             if(list[i] > list[j]):
@@ -404,38 +396,46 @@ def cornersHeuristic(state, problem):
             j += 1
         return i
 
-    # I FUCKIN DID IT BITCH
     position = (state[0], state[1])
-    ncorners = [state[2], state[3], state[4], state[5]]
+    state_corners = [state[2], state[3], state[4], state[5]]
     corners_left = []
-    distances = []
     total = 0
     maxDist = manhattanDistance(corners[0], corners[3])
 
     for i in [0,1,2,3]:
-        if(ncorners[i] == 0):
+        if(state_corners[i] == False): # We gather all the corners left to visit
             corners_left.append(corners[i])
 
     current = position
     while len(corners_left) > 0:
-        for c in corners_left:
-            distances.append(manhattanDistance(c, current))
+        """
+        In this loop we will trace the shortest path between the current state and passing through each
+        of the corners left to visit. We choose the shortest distance between each of the corners left to the 
+        current position, add it to the total distance and make the closest corner the next current state, until
+        there are no corners left.
+        """
+        distances = [] # resetting the list of distances so it always matches the current number of nodes left
+        for corner in corners_left:
+            distances.append(manhattanDistance(corner, current))
         i = lowest(distances)
         seg = distances.pop(i)
         current = corners_left.pop(i)
         
         if len(corners_left) == 2 and manhattanDistance(corners_left[0], corners_left[1]) == maxDist:
-                aux = current
-                i = lowest(distances)
-                total += distances.pop(i)
-                distances.append(seg)
-                current = corners_left.pop(i)
-                corners_left.append(aux)
+            """
+            This condition accounts for a very specific instance in which there are 3 corners left and the 
+            program is closer to the corner in between the other two; in this case the heuristic is inconsistent.
+            We solve this by instead taking the second closest corner and working from there.
+            """
+            aux = current
+            i = lowest(distances)
+            total += distances.pop(i)
+            distances.append(seg)
+            current = corners_left.pop(i)
+            corners_left.append(aux)
         else:
+            "Normally this segment will be executed"
             total += seg
-        
-        distances = []
-
 
     return total
 

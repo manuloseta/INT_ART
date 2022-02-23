@@ -73,74 +73,70 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def GraphSearch(problem, open_list, ucs):
+def GraphSearch(problem, open_list):
+    """
+    This method implements graph search given a problem, an open list structure,
+    and a flag that accounts for the uniform cost search algorithm. The method uses 
+    a closed list to insert already visited nodes so as to eliminate repeated states.
 
-    node = Node(problem.getStartState(), None, None, None)
-    if ucs:
-        open_list.push(node, 0)
-    else:
-        open_list.push(node)
+    Each of the following 4 search algorithms call this method with their respective open list
+    structure.
+    """
+
+    node = Node(state=problem.getStartState(), parent=None, operator=None, cost=0) # We define the root node
+    open_list.push(node)
     closed_list = []
-    directions = []
-    while True:
 
-        if open_list.isEmpty() == True:
-            "failure"
-            return [] 
-
+    while open_list.isEmpty() is False: # Will only get out of the while loop if the algorithm fails to find a path
         node = open_list.pop()
         if problem.isGoalState(Node.getState(node)):
-            "construct list of directions" 
-            parent = Node.getParent(node)
-            while parent is not None:
-                directions.append(Node.getOperator(node))
-                node = parent
-                parent = Node.getParent(node)
-            directions.reverse()
-            return directions 
+            return Node.getOperations(node) # In case of success, we return list of operators from initial state to goal state
 
-        if Node.getState(node) not in closed_list:
+        if Node.getState(node) not in closed_list: # We expand the current node if necessary
             closed_list.append(Node.getState(node))
             successors = problem.getSuccessors(Node.getState(node))
-            parent = node
-            for nn in successors:
-                node = Node(nn[0], parent, nn[1], nn[2])
-                if ucs:
-                    open_list.push(node, Node.calcCumulative(node))
-                else:
-                    open_list.push(node)
+            for successor in successors: # We push in the open list a new node for every successor
+                open_list.push(Node(state=successor[0], parent=node, operator=successor[1], cost=successor[2]))
+                
+    return [] # in case of failure, we return an empty list
+    
 
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    The open list structure used is a stack
     """
     "*** YOUR CODE HERE ***"
     
     open_list = util.Stack()
-    return GraphSearch(problem, open_list, 0)
+    return GraphSearch(problem, open_list)
     
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
+    """
+    Search the shallowest nodes in the search tree first.
+    The open list structure used is a queue.
+    """
     "*** YOUR CODE HERE ***"
     open_list = util.Queue()
-    return GraphSearch(problem, open_list, 0)
+    return GraphSearch(problem, open_list)
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
+    """
+    Search the node of least total cost first.
+    The open list structure used is a priority queue.
+    """
     "*** YOUR CODE HERE ***"
-    open_list = util.PriorityQueue()
-    return GraphSearch(problem, open_list, 1)
+
+    def priorityFunction(node):
+        """
+        The priority function defined is the ucs function: it returns the cumulative cost
+        from root to the current node
+        """
+        return Node.getCumulative(node)
+
+    open_list = util.PriorityQueueWithFunction(priorityFunction)
+    return GraphSearch(problem, open_list)
 
 def nullHeuristic(state, problem=None):
     """
@@ -150,14 +146,23 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
+    """
+    Search the node that has the lowest combined cost and heuristic first.
+    The open list structure used is a priority queue with function. Said function
+    will be defined by the heuristic.
+    """
     "*** YOUR CODE HERE ***"
 
     def priorityFunction(node):
-        return (heuristic(Node.getState(node), problem) + Node.calcCumulative(node))
+        """
+        The priority function defined is the astar f function: it returns g+h 
+        (the cumulative cost from the start state to the current state + the value of
+        the heuristic)
+        """
+        return (heuristic(Node.getState(node), problem) + Node.getCumulative(node))
 
     open_list = util.PriorityQueueWithFunction(priorityFunction)
-    return GraphSearch(problem, open_list, 0)
+    return GraphSearch(problem, open_list)
 
 
 # Abbreviations

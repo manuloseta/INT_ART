@@ -75,8 +75,7 @@ def tinyMazeSearch(problem):
 
 def GraphSearch(problem, open_list):
     """
-    This method implements graph search given a problem, an open list structure,
-    and a flag that accounts for the uniform cost search algorithm. The method uses 
+    This method implements graph search given a problem and an open list structure. The method uses 
     a closed list to insert already visited nodes so as to eliminate repeated states.
 
     Each of the following 4 search algorithms call this method with their respective open list
@@ -89,6 +88,7 @@ def GraphSearch(problem, open_list):
 
     while open_list.isEmpty() is False: # Will only get out of the while loop if the algorithm fails to find a path
         node = open_list.pop()
+        
         if problem.isGoalState(Node.getState(node)):
             return Node.getOperations(node) # In case of success, we return list of operators from initial state to goal state
 
@@ -97,7 +97,7 @@ def GraphSearch(problem, open_list):
             successors = problem.getSuccessors(Node.getState(node))
             for successor in successors: # We push in the open list a new node for every successor
                 open_list.push(Node(state=successor[0], parent=node, operator=successor[1], cost=successor[2]))
-                
+
     return [] # in case of failure, we return an empty list
     
 

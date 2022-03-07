@@ -17,7 +17,7 @@ from reversi import (
     from_dictionary_to_array_board,
 )
 from tournament import StudentHeuristic, Tournament
-from G2351_p2_01_Hernández_LópezSerrano import Solution1, Solution2
+from G2351_p2_01_Hernández_LópezSerrano import Solution1, Solution2, Solution3
 
 
 class Heuristic1(StudentHeuristic):
@@ -99,7 +99,7 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 
 
 tour = Tournament(max_depth=3, init_match=create_match)
-strats = {'opt1': [Solution1], 'opt2': [Solution2], 'opt3': [Heuristic3]}
+strats = {'opt1': [Solution1], 'opt2': [Solution2], 'opt3': [Solution3]}
 
 n = 1
 scores, totals, names = tour.run(

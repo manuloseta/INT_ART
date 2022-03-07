@@ -24,3 +24,14 @@ class Solution2(StudentHeuristic):
 
   def evaluation_function(self, state: TwoPlayerGameState) -> float:
     return float(np.random.rand())
+
+class Solution3(StudentHeuristic):
+  def get_name(self) -> str:
+    return "solution3"
+  def evaluation_function(self, state: TwoPlayerGameState) -> float:
+    # let's use an auxiliary function
+    aux = self.dummy(321)
+    return aux
+
+  def dummy(self, n: int) -> int:
+    return n + 15

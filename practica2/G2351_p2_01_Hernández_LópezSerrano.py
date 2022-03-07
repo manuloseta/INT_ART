@@ -1,4 +1,5 @@
 import time
+import numpy as np
 from game import (
     TwoPlayerGameState,
 )
@@ -20,8 +21,6 @@ class Solution1(StudentHeuristic):
 class Solution2(StudentHeuristic):
   def get_name(self) -> str:
     return "solution2"
+
   def evaluation_function(self, state: TwoPlayerGameState) -> float:
-    print("sleeping")
-    time.sleep(3)
-    print("awake")
-    return 2
+    return float(np.random.rand())

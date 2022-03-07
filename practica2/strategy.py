@@ -200,21 +200,112 @@ class MinimaxAlphaBetaStrategy(Strategy):
     ) -> TwoPlayerGameState:
         """Compute the next state in the game."""
 
-        # NOTE <YOUR CODE HERE>
+        alpha = -np.inf
+        beta = np.inf
 
-        """
-        # Use this code snippet to trace the execution of the algorithm
+        minimax_value, minimax_successor = self._max_value(
+            state,
+            self.max_depth_minimax,
+            alpha,
+            beta,
+        )
 
-                 if self.verbose > 1:
+        if self.verbose > 1:
                     print('{}: [{:.2g}, {:.2g}]'.format(
                             state.board,
                             alpha,
                             beta,
                         )
                     )
-        """
 
         if minimax_successor:
             minimax_successor.minimax_value = minimax_value
 
         return minimax_successor
+
+    def _min_value(
+        self,
+        state: TwoPlayerGameState,
+        depth: int,
+        alpha: int,
+        beta: int,
+    ) -> float:
+        """Min step of the minimax algorithm."""
+
+        if state.end_of_game or depth == 0:
+            minimax_value = self.heuristic.evaluate(state)
+            minimax_successor = None
+        else:
+            minimax_value = np.inf
+
+            for successor in self.generate_successors(state):
+                if self.verbose > 1:
+                    print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
+
+                successor_minimax_value, _ = self._max_value(
+                    successor,
+                    depth - 1,
+                    alpha,
+                    beta,
+                )
+
+                if (successor_minimax_value < minimax_value):
+                    minimax_value = successor_minimax_value
+                    minimax_successor = successor
+
+                if (alpha >= minimax_value):
+                    if self.verbose > 1:
+                        print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, minimax_value))
+                    return minimax_value, minimax_successor
+
+                if (minimax_value <= beta):
+                    beta = minimax_value
+
+        if self.verbose > 1:
+            print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
+
+        return minimax_value, minimax_successor
+
+    def _max_value(
+        self,
+        state: TwoPlayerGameState,
+        depth: int,
+        alpha: int,
+        beta: int,
+    ) -> float:
+        """Max step of the minimax algorithm."""
+
+        if state.end_of_game or depth == 0:
+            minimax_value = self.heuristic.evaluate(state)
+            minimax_successor = None
+        else:
+            minimax_value = -np.inf
+
+            for successor in self.generate_successors(state):
+                if self.verbose > 1:
+                    print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
+
+                successor_minimax_value, _ = self._min_value(
+                    successor,
+                    depth - 1,
+                    alpha,
+                    beta
+                )
+
+                if (successor_minimax_value > minimax_value):
+                    minimax_value = successor_minimax_value
+                    minimax_successor = successor
+                
+                if (minimax_value >= beta):
+                    if self.verbose > 1:
+                        print('{}: {} ({},{})'.format(state.board, minimax_value, minimax_value, beta))
+                    return minimax_value, minimax_successor
+
+                if (alpha <= minimax_value):
+                    alpha = minimax_value
+                
+
+        if self.verbose > 1:
+            print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
+
+        return minimax_value, minimax_successor

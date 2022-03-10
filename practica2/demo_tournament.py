@@ -101,7 +101,7 @@ def create_match(player1: Player, player2: Player) -> TwoPlayerMatch:
 tour = Tournament(max_depth=2, init_match=create_match)
 strats = {'opt1': [Solution1], 'opt2': [Solution2], 'opt3': [Solution3]}
 
-n = 6
+n = 25
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,

@@ -33,39 +33,35 @@ class Solution3(StudentHeuristic):
     return "four_sectors_2351_01"
   def evaluation_function(self, state: TwoPlayerGameState) -> float:
     board_array = state.board
-    # print(board_array)
-    # print(state.board)
     sector_values={1: 0.4, 2: 0.2, 3: 0.1, 4: 0.8}
     score=0
     label=state.player_max.label
-    # print(label)
     for key in board_array.keys():
-      # print(key)
       if board_array.get(key) == label:
-        score += sector_values.get(Solution3.sector(key))
+        score += sector_values.get(sector(key))
       else:
-        score -= sector_values.get(Solution3.sector(key))
+        score -= sector_values.get(sector(key))
 
     return score
 
-  def is_corner(self, position=(1,1), height=8, width=8) -> bool:
-    corners = [(1,1),(1,height),(width,1),(width,height)]
-    return (position in corners)
+def is_corner(position: tuple, height=8, width=8) -> bool:
+  corners = [(1,1),(1,height),(width,1),(width,height)]
+  return (position in corners)
 
-  def is_in_sector(self, position=(1,1), sector=1, height=8, width=8) -> bool:
-    # sector 1 is the border, all the way to 4, the center
-    x,y=position[0],position[1]
-    first_bool = (x==sector or x==width-(sector-1)) and (y>=sector and y<=height-(sector-1))
-    second_bool = (y==sector or y==height-(sector-1)) and (x>=sector and x<=width-(sector-1))
-    if Solution3.is_corner(position):
-      if sector==4: 
-        return True
-      else: 
-        return False
-    return (first_bool or second_bool)
+def is_in_sector(position: tuple, sector=1, height=8, width=8) -> bool:
+  # sector 1 is the border, all the way to 4, the center
+  x,y=position[0],position[1]
+  first_bool = (x==sector or x==width-(sector-1)) and (y>=sector and y<=height-(sector-1))
+  second_bool = (y==sector or y==height-(sector-1)) and (x>=sector and x<=width-(sector-1))
+  if is_corner(position):
+    if sector==4: 
+      return True
+    else: 
+      return False
+  return (first_bool or second_bool)
 
-  def sector(self, position=(1,1), height=8, width=8) -> int:
-    # sector 1 is the border, all the way to 4, the center
-    for sector in [1,2,3,4]:
-      if(Solution3.is_in_sector(position,sector)):
-        return sector
+def sector(position: tuple, height=8, width=8) -> int:
+  # sector 1 is the border, all the way to 4, the center
+  for sector in [1,2,3,4]:
+    if(is_in_sector(position,sector)):
+      return sector

@@ -9,6 +9,7 @@ from __future__ import annotations  # For Python 3.7
 import inspect  # for dynamic members of a module
 import os
 import sys
+import timeit
 from abc import ABC
 from importlib import find_loader, import_module, util
 from typing import Callable, Tuple
@@ -128,7 +129,7 @@ class Tournament(object):
                     depth=self.__max_depth
                     pl1 = Player(
                         name=name1,
-                        strategy= MinimaxAlphaBetaStrategy( # MinimaxStrategy( 
+                        strategy= MinimaxAlphaBetaStrategy( # MinimaxStrategy(
                             heuristic=Heuristic(name=sh1.get_name(), evaluation_function=sh1.evaluation_function),
                             max_depth_minimax=depth,
                             verbose=0,
@@ -154,7 +155,14 @@ class Tournament(object):
             players = [pl2, pl1]
         game = self.__init_match(players[0], players[1])
         try:
+
+            start = timeit.default_timer()
+
             game_scores = game.play_match()
+
+            end = timeit.default_timer()
+            print("Time: ", end-start)
+            
             # let's get the scores (do not assume they will always be binary)
             # we assume a higher score is better
             if player1_first:

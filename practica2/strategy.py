@@ -210,14 +210,6 @@ class MinimaxAlphaBetaStrategy(Strategy):
             beta,
         )
 
-        if self.verbose > 1:
-                    print('{}: [{:.2g}, {:.2g}]'.format(
-                            state.board,
-                            alpha,
-                            beta,
-                        )
-                    )
-
         if minimax_successor:
             minimax_successor.minimax_value = minimax_value
 
@@ -237,33 +229,26 @@ class MinimaxAlphaBetaStrategy(Strategy):
             minimax_successor = None
         else:
             minimax_value = np.inf
-
             for successor in self.generate_successors(state):
                 if self.verbose > 1:
                     print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
-
                 successor_minimax_value, _ = self._max_value(
                     successor,
                     depth - 1,
                     alpha,
                     beta,
                 )
-
                 if (successor_minimax_value < minimax_value):
                     minimax_value = successor_minimax_value
                     minimax_successor = successor
-
                 if (alpha >= minimax_value):
                     if self.verbose > 1:
                         print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, minimax_value))
                     return minimax_value, minimax_successor
-
                 if (minimax_value <= beta):
                     beta = minimax_value
-
         if self.verbose > 1:
             print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
-
         return minimax_value, minimax_successor
 
     def _max_value(
@@ -280,32 +265,24 @@ class MinimaxAlphaBetaStrategy(Strategy):
             minimax_successor = None
         else:
             minimax_value = -np.inf
-
             for successor in self.generate_successors(state):
                 if self.verbose > 1:
                     print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
-
                 successor_minimax_value, _ = self._min_value(
                     successor,
                     depth - 1,
                     alpha,
                     beta
                 )
-
                 if (successor_minimax_value > minimax_value):
                     minimax_value = successor_minimax_value
                     minimax_successor = successor
-                
                 if (minimax_value >= beta):
                     if self.verbose > 1:
                         print('{}: {} ({},{})'.format(state.board, minimax_value, minimax_value, beta))
                     return minimax_value, minimax_successor
-
                 if (alpha <= minimax_value):
                     alpha = minimax_value
-                
-
         if self.verbose > 1:
             print('{}: {} ({},{})'.format(state.board, minimax_value, alpha, beta))
-
         return minimax_value, minimax_successor
